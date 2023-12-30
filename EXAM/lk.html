@@ -59,9 +59,9 @@
                     <td>2023-01-01</td>
                     <td>3000 руб.</td>
                     <td>
-                        <button class="btn btn-info btn-sm" data-toggle="modal" data-target="#detailsModal"><img src="images/about.png" alt="Подробнее"></button>
-                        <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editModal"><img src="images/edit.png" alt="Редактировать"></button>
-                        <button class="btn btn-danger btn-sm" data-toggle="modal" data-target="#deleteModal"><img src="images/delete.png" alt="Удалить"></button>
+                        <button class="btn btn-custom btn-sm" data-toggle="modal" data-target="#detailsModal"><img src="images/about.png" alt="Подробнее" width="30px"></button>
+                        <button class="btn btn-custom btn-sm" data-toggle="modal" data-target="#editModal"><img src="images/edit.png" alt="Редактировать" width="30px"></button>
+                        <button class="btn btn-custom btn-sm" data-toggle="modal" data-target="#deleteModal"><img src="images/delete.png" alt="Удалить" width="30px"></button>
                     </td>
                 </tr>
                 <tr>
@@ -70,9 +70,9 @@
                     <td>2023-01-01</td>
                     <td>3000 руб.</td>
                     <td>
-                        <button class="btn btn-info btn-sm" data-toggle="modal" data-target="#detailsModal"><img src="images/about.png" alt="Подробнее"></button>
-                        <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editModal"><img src="images/edit.png" alt="Редактировать"></button>
-                        <button class="btn btn-danger btn-sm" data-toggle="modal" data-target="#deleteModal"><img src="images/delete.png" alt="Удалить"></button>
+                        <button class="btn btn-custom btn-sm" data-toggle="modal" data-target="#detailsModal"><img src="images/about.png" alt="Подробнее" width="30px"></button>
+                        <button class="btn btn-custom btn-sm" data-toggle="modal" data-target="#editModal"><img src="images/edit.png" alt="Редактировать" width="30px"></button>
+                        <button class="btn btn-custom btn-sm" data-toggle="modal" data-target="#deleteModal"><img src="images/delete.png" alt="Удалить" width="30px"></button>
                     </td>
                 </tr>
                 <tr>
@@ -81,9 +81,9 @@
                     <td>2023-01-01</td>
                     <td>3000 руб.</td>
                     <td>
-                        <button class="btn btn-info btn-sm" data-toggle="modal" data-target="#detailsModal"><img src="images/about.png" alt="Подробнее"></button>
-                        <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editModal"><img src="images/edit.png" alt="Редактировать"></button>
-                        <button class="btn btn-danger btn-sm" data-toggle="modal" data-target="#deleteModal"><img src="images/delete.png" alt="Удалить"></button>
+                        <button class="btn btn-custom btn-sm" data-toggle="modal" data-target="#detailsModal"><img src="images/about.png" alt="Подробнее" width="30px"></button>
+                        <button class="btn btn-custom btn-sm" data-toggle="modal" data-target="#editModal"><img src="images/edit.png" alt="Редактировать" width="30px"></button>
+                        <button class="btn btn-custom btn-sm" data-toggle="modal" data-target="#deleteModal"><img src="images/delete.png" alt="Удалить" width="30px"></button>
                     </td>
                 </tr>
             </tbody>
@@ -119,18 +119,17 @@
                         <ul id="optionsList">
                             <!-- Динамически заполняемый список опций -->
                             <li>Опция 1 - Описание - Скидка/Надбавка</li>
-                            <!-- Другие опции -->
                         </ul>
                         <h6>Итоговая стоимость: <span id="totalCost">3000 руб.</span></h6>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                        <button type="button" class="btn btn-custom-green" data-dismiss="modal">Закрыть</button>
                     </div>
                 </div>
             </div>
         </div>
     
-    <!-- Модальное окно для "Редактировать" -->
+        <!-- Модальное окно для "Редактировать" -->
         <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
@@ -142,66 +141,46 @@
                     </div>
                     
                     <div class="modal-body">
-                        <!-- Форма редактирования заявки -->
                         <form>
-                            <!-- Название выбранного маршрута -->
                             <div class="form-group">
                                 <label for="editSelectedRoute">Маршрут</label>
                                 <input type="text" class="form-control" id="editSelectedRoute">
                             </div>
-
-                            <!-- ФИО выбранного гида -->
                             <div class="form-group">
                                 <label for="editSelectedGuide">Гид</label>
                                 <input type="text" class="form-control" id="editSelectedGuide">
                             </div>
-
-                            <!-- Поле для выбора даты экскурсии -->
                             <div class="form-group">
                                 <label for="editExcursionDate">Дата экскурсии</label>
                                 <input type="date" class="form-control" id="editExcursionDate">
                             </div>
-
-                            <!-- Поле для выбора времени начала экскурсии -->
                             <div class="form-group">
                                 <label for="editStartTime">Время начала</label>
                                 <input type="time" class="form-control" id="editStartTime">
                             </div>
-
-                            <!-- Поле для выбора длительности экскурсии -->
                             <div class="form-group">
                                 <label for="editDurationSelect">Длительность</label>
                                 <select class="form-control" id="editDurationSelect">
                                     <option>1 час</option>
                                     <option>2 часа</option>
-                                    <!-- Другие варианты длительности -->
                                 </select>
                             </div>
-
-                            <!-- Поле для указания количества человек -->
                             <div class="form-group">
                                 <label for="editGroupSize">Количество человек</label>
                                 <input type="number" class="form-control" id="editGroupSize" min="1">
                             </div>
-
-                            <!-- Дополнительные опции -->
                             <div class="form-group">
                                 <label>Дополнительные опции</label>
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox" id="editOption1">
                                     <label class="form-check-label" for="editOption1">Опция 1</label>
                                 </div>
-                                <!-- Другие опции -->
                             </div>
-
-                            <!-- Блок с итоговой стоимостью -->
                             <div class="form-group">
                                 <label for="editTotalCost">Итоговая стоимость</label>
                                 <input type="text" class="form-control" id="editTotalCost" readonly>
                             </div>
-
-                            <!-- Кнопки сохранения и отмены -->
-                            <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+                            <button type="submit" class="btn btn-custom">Сохранить изменения</button>
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Отменить</button>
                         </form>
                     </div>
@@ -210,26 +189,26 @@
         </div>
 
     
-    <!-- Модальное окно для подтверждения "Удалить" -->
-    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="deleteModalLabel">Подтверждение удаления</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Закрыть">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    Вы уверены, что хотите удалить эту заявку?
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
-                    <button type="button" class="btn btn-danger">Удалить</button>
+        <!-- Модальное окно для подтверждения "Удалить" -->
+        <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteModalLabel">Подтверждение удаления</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Закрыть">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        Вы уверены, что хотите удалить эту заявку?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+                        <button type="button" class="btn btn-custom">Удалить</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
     
 
     <footer class="bg-light text-center text-lg-start mt-4">
