@@ -10,3 +10,21 @@
 html {
     scroll-behavior: smooth;
 }
+
+.btn-custom {
+    background-color: #ff7700;
+    color: #FFFFFF;
+}
+
+.btn-custom-green {
+    background-color: #408389;
+    color: #FFFFFF;
+}
+
+.page-link {
+    color: #408389;
+}
+
+.page-item .page-link:hover {
+    color: #24494d; 
+}
