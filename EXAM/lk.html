@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Московские Шаги</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display&display=swap" rel="stylesheet">
+
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <div class="container">
+                <a class="navbar-brand d-flex align-items-center" href="#">
+                    <img src="images/logo.png" alt="logo" style="width: 80px;">
+                    <p class="mb-0 ms-2">Московские Шаги</p>
+                </a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarResponsive">
+                    <ul class="navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="main.html">Главная страница</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="lk.html">Личный кабинет</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    
+    <div id="notification-area" aria-live="polite" aria-atomic="true" style="position: relative; min-height: 200px;">
+        <!-- алерты -->
+    </div>
+    
+    <div class="container mt-4">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">№</th>
+                    <th scope="col">Маршрут</th>
+                    <th scope="col">Дата экскурсии</th>
+                    <th scope="col">Стоимость</th>
+                    <th scope="col">Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th scope="row">1</th>
+                    <td>Название</td>
+                    <td>2023-01-01</td>
+                    <td>3000 руб.</td>
+                    <td>
+                        <button class="btn btn-info btn-sm" data-toggle="modal" data-target="#detailsModal">Подробнее</button>
+                        <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editModal">Редактировать</button>
+                        <button class="btn btn-danger btn-sm" data-toggle="modal" data-target="#deleteModal">Удалить</button>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">2</th>
+                    <td>Название</td>
+                    <td>2023-01-01</td>
+                    <td>3000 руб.</td>
+                    <td>
+                        <button class="btn btn-info btn-sm" data-toggle="modal" data-target="#detailsModal">Подробнее</button>
+                        <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editModal">Редактировать</button>
+                        <button class="btn btn-danger btn-sm" data-toggle="modal" data-target="#deleteModal">Удалить</button>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">3</th>
+                    <td>Название</td>
+                    <td>2023-01-01</td>
+                    <td>3000 руб.</td>
+                    <td>
+                        <button class="btn btn-info btn-sm" data-toggle="modal" data-target="#detailsModal">Подробнее</button>
+                        <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editModal">Редактировать</button>
+                        <button class="btn btn-danger btn-sm" data-toggle="modal" data-target="#deleteModal">Удалить</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <nav aria-label="Page navigation example">
+        <ul class="pagination justify-content-center">
+            <li class="page-item"><a class="page-link" href="#">Назад</a></li>
+            <li class="page-item"><a class="page-link" href="#">1</a></li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li>
+            <li class="page-item"><a class="page-link" href="#">Вперед</a></li>
+        </ul>
+    </nav>
+    
+        <!-- Модальное окно для "Подробнее" -->
+        <div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="detailsModalLabel">Детали заявки</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Закрыть">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <h6>Маршрут: <span id="routeName">Название маршрута</span></h6>
+                        <h6>Дата экскурсии: <span id="excursionDate">Дата</span></h6>
+                        <h6>Гид: <span id="guideName">Имя гида</span></h6>
+                        <hr>
+                        <h6>Опции:</h6>
+                        <ul id="optionsList">
+                            <!-- Динамически заполняемый список опций -->
+                            <li>Опция 1 - Описание - Скидка/Надбавка</li>
+                            <!-- Другие опции -->
+                        </ul>
+                        <h6>Итоговая стоимость: <span id="totalCost">3000 руб.</span></h6>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+    <!-- Модальное окно для "Редактировать" -->
+        <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editModalLabel">Редактирование заявки</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Закрыть">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    
+                    <div class="modal-body">
+                        <!-- Форма редактирования заявки -->
+                        <form>
+                            <!-- Название выбранного маршрута -->
+                            <div class="form-group">
+                                <label for="editSelectedRoute">Маршрут</label>
+                                <input type="text" class="form-control" id="editSelectedRoute">
+                            </div>
+
+                            <!-- ФИО выбранного гида -->
+                            <div class="form-group">
+                                <label for="editSelectedGuide">Гид</label>
+                                <input type="text" class="form-control" id="editSelectedGuide">
+                            </div>
+
+                            <!-- Поле для выбора даты экскурсии -->
+                            <div class="form-group">
+                                <label for="editExcursionDate">Дата экскурсии</label>
+                                <input type="date" class="form-control" id="editExcursionDate">
+                            </div>
+
+                            <!-- Поле для выбора времени начала экскурсии -->
+                            <div class="form-group">
+                                <label for="editStartTime">Время начала</label>
+                                <input type="time" class="form-control" id="editStartTime">
+                            </div>
+
+                            <!-- Поле для выбора длительности экскурсии -->
+                            <div class="form-group">
+                                <label for="editDurationSelect">Длительность</label>
+                                <select class="form-control" id="editDurationSelect">
+                                    <option>1 час</option>
+                                    <option>2 часа</option>
+                                    <!-- Другие варианты длительности -->
+                                </select>
+                            </div>
+
+                            <!-- Поле для указания количества человек -->
+                            <div class="form-group">
+                                <label for="editGroupSize">Количество человек</label>
+                                <input type="number" class="form-control" id="editGroupSize" min="1">
+                            </div>
+
+                            <!-- Дополнительные опции -->
+                            <div class="form-group">
+                                <label>Дополнительные опции</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="editOption1">
+                                    <label class="form-check-label" for="editOption1">Опция 1</label>
+                                </div>
+                                <!-- Другие опции -->
+                            </div>
+
+                            <!-- Блок с итоговой стоимостью -->
+                            <div class="form-group">
+                                <label for="editTotalCost">Итоговая стоимость</label>
+                                <input type="text" class="form-control" id="editTotalCost" readonly>
+                            </div>
+
+                            <!-- Кнопки сохранения и отмены -->
+                            <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Отменить</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    
+    <!-- Модальное окно для подтверждения "Удалить" -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Подтверждение удаления</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Закрыть">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Вы уверены, что хотите удалить эту заявку?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+                    <button type="button" class="btn btn-danger">Удалить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+    <footer class="bg-light text-center text-lg-start mt-4">
+        <div class="container p-4">
+            <div class="row">
+                <div class="col-lg-6 col-md-12 mb-4 mb-md-0">
+                    <h5 class="text-uppercase">Московские Шаги</h5>
+                    <p>Экскурсии по историческим местам Москвы с опытными гидами.</p>
+                </div>
+    
+                <div class="col-lg-6 col-md-12 mb-4 mb-md-0">
+                    <h5 class="text-uppercase">Контакты</h5>
+                    <p><strong>Адрес:</strong> бебебебе</p>
+                    <p><strong>Телефон:</strong> +7 (123) 123-45-67</p>
+                    <p><strong>Email:</strong> info@moscowsteps.ru</p>
+                </div>
+            </div>
+        </div>
+    
+        <div class="text-center p-3 bg-secondary text-white">
+            © 2023 Московские Шаги. Все права защищены
+        </div>
+    </footer>
+    
+    
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.9/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+</html>
