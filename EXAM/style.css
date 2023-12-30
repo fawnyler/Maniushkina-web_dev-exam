@@ -1,0 +1,12 @@
+* {
+    font-family: '20011', sans-serif;
+}
+
+@font-face {
+    font-family: '20011';
+    src: url("fonts/20011.ttf");
+}
+
+html {
+    scroll-behavior: smooth;
+}
