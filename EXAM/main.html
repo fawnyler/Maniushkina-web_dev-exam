@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="images/logo.png">
     <title>Московские Шаги</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="style.css">
@@ -37,8 +38,9 @@
         </nav>
     </header>
     
-    <div id="notification-area" aria-live="polite" aria-atomic="true" style="position: relative; min-height: 200px;">
-        <!-- алерты -->
+    <div id="notification-panel" class="row notification-panel">
+        <div class="notification-content" id="notification-content">
+        </div>
     </div>
 
     <div class="container mt-4">
@@ -73,73 +75,83 @@
         </div>
     </div>
     
-    <div class="container mt-4">
-        <h2 class="mb-3">Список пешеходных маршрутов</h2>
-        <form>
-            <div class="form-row align-items-end">
-                <div class="col">
-                    <input type="text" class="form-control" id="routeName" placeholder="Введите название маршрута">
+            <div class="container mt-4">
+            <h2 class="mb-3">Список пешеходных маршрутов</h2>
+            <form>
+                <div class="form-row align-items-end">
+                    <div class="col">
+                        <input type="text" class="form-control" id="routeName" placeholder="Введите название маршрута">
+                    </div>
+                
+                    <div class="col">
+                        <label for="attractionSelect">Выберите достопримечтальность</label>
+                        <select class="form-control" id="attractionSelect">
+                        </select>
+                    </div>
+                
+                    <div class="col-auto mt-2">
+                        <button type="button" class="btn btn-custom-green" id="searchButton">Поиск маршрутов</button>
+                        <button type="button" class="btn btn-secondary" id="resetButton">Сбросить фильтр</button>
+                    </div>
+                    
                 </div>
+            </form>
         
-                <div class="col">
-                    <select class="form-control" id="landmarkSelect">
-                        <option>Выберите достопримечательность</option>
-                        <option>Красная площадь</option>
-                        <option>Большой театр</option>
-                        <option>ГУМ</option>
-                    </select>
+            <div class="route-list" id="route-list">
+                <div class="table-responsive">
+                    <table id="data-table" class="table table-hover mt-4">
+                        <thead></thead>
+                        <tbody id="data-container"></tbody>
+                    </table>
                 </div>
-        
-                <div class="col-auto">
-                    <button type="submit" class="btn btn-custom-green">Поиск маршрутов</button>
+                <div id="pagination">
+                    <ul class="pagination-list justify-content-center" id="pagination-list"></ul>
                 </div>
             </div>
-        </form>
         
-        <div class="table-responsive">
-            <table class="table table-hover mt-4">
-                <thead>
-                    <tr>
-                        <th scope="col">Маршрут</th>
-                        <th scope="col">Достопримечательности</th>
-                        <th scope="col">Описание маршрута</th>
-                        <th scope="col"></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Название</td>
-                        <td>Название достопримечательности</td>
-                        <td>Текст описания</td>
-                        <td><a href="#" class="btn btn-custom">Выбрать маршрут</a></td>
-                    </tr>
-        
-                    <tr>
-                        <td>Название</td>
-                        <td>Название достопримечательности</td>
-                        <td>Текст описания</td>
-                        <td><a href="#" class="btn btn-custom">Выбрать маршрут</a></td>
-                    </tr>
-        
-                    <tr>
-                        <td>Название</td>
-                        <td>Название достопримечательности</td>
-                        <td>Текст описания</td>
-                        <td><a href="#" class="btn btn-custom">Выбрать маршрут</a></td>
-                    </tr>
-                </tbody>
-            </table>
+        <div id="guides-section">
+            <h2 id="selected-route-title" class="mb-3">Гиды по маршруту: Название Маршрута</h2>
+            <div class="container mt-4">
+                <form>
+                    <div class="form-row align-items-end">
+                        <div class="col">
+                            <label for="languageSelect">Выберите язык экскурсии</label>
+                            <select class="form-control" id="languageSelect">
+                                <option>Не выбрано</option>
+                            </select>
+                        </div>
+                        <div class="col">
+                            <label for="experienceFrom">Опыт работы</label>
+                            <input type="number" class="form-control" id="experienceFrom" placeholder="от">
+                        </div>
+                        <div class="col">
+                            <input type="number" class="form-control" id="experienceTo" placeholder="до">
+                        </div>
+
+                        <div class="col-auto">
+                            <button type="submit" class="btn btn-custom-green">Поиск гидов</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="table mt-4">
+                    <tbody>
+                        <tr>
+                            <td><img src="path_to_guide_photo.jpg" alt="Гид 1" style="width: 100px; height: 100px;"></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td><a href="#" class="btn btn-custom">Выбрать гида</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
-        <nav aria-label="Page navigation example">
-            <ul class="pagination justify-content-center">
-                <li class="page-item"><a class="page-link" href="#">Назад</a></li>
-                <li class="page-item"><a class="page-link" href="#">1</a></li>
-                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                <li class="page-item"><a class="page-link" href="#">Вперед</a></li>
-            </ul>
-        </nav>
-        
+    </div>
+
         <div class="container mt-4 mb-4">
             <div class="d-flex justify-content-center">
                 <button type="button" class="btn btn-custom-green" data-toggle="modal" data-target="#orderModal">
@@ -191,7 +203,11 @@
                                 <label>Дополнительные опции</label>
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox" id="option1">
-                                    <label class="form-check-label" for="option1">Опция 1</label>
+                                    <label class="form-check-label" for="option1">Интерактивный путеводитель - * 1,5 раза</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="option2">
+                                    <label class="form-check-label" for="option2">Легкие закуски и горячие напитки во время экскурсии - + 1000 руб/посетитель</label>
                                 </div>
                             </div>
                             <div class="form-group">
@@ -206,81 +222,6 @@
             </div>
         </div>
 
-
-        <div id="guides-section">
-            <h2 id="selected-route-title" class="mb-3">Гиды по маршруту: Название Маршрута</h2>
-            <div class="container mt-4">
-                <form>
-                    <div class="form-row align-items-end">
-                        <div class="col">
-                            <label for="languageSelect">Выберите язык экскурсии</label>
-                            <select class="form-control" id="languageSelect">
-                                <option>Английский</option>
-                                <option>Французский</option>
-                                <option>Немецкий</option>
-                            </select>
-                        </div>
-                        <div class="col">
-                            <label for="experienceFrom">Опыт работы</label>
-                            <input type="number" class="form-control" id="experienceFrom" placeholder="от">
-                        </div>
-                        <div class="col">
-                            <input type="number" class="form-control" id="experienceTo" placeholder="до">
-                        </div>
-
-                        <div class="col-auto">
-                            <button type="submit" class="btn btn-custom-green">Поиск гидов</button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-            
-            <div class="table-responsive">
-                <table class="table mt-4">
-                    <thead>
-                        <tr>
-                            <th scope="col"></th>
-                            <th scope="col">ФИО</th>
-                            <th scope="col">Языки</th>
-                            <th scope="col">Опыт работы</th>
-                            <th scope="col">Стоимость услуг в час</th>
-                            <th scope="col"></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><img src="path_to_guide_photo.jpg" alt="Гид 1" style="width: 100px; height: 100px;"></td>
-                            <td>ФИО</td>
-                            <td>русский</td>
-                            <td>3 года</td>
-                            <td>стомость/час</td>
-                            <td><a href="#" class="btn btn-custom">Выбрать гида</a></td>
-                        </tr>
-        
-                        <tr>
-                            <td><img src="path_to_guide_photo.jpg" alt="Гид 1" style="width: 100px; height: 100px;"></td>
-                            <td>ФИО</td>
-                            <td>русский</td>
-                            <td>3 года</td>
-                            <td>стомость/час</td>
-                            <td><a href="#" class="btn btn-custom">Выбрать гида</a></td>
-                        </tr>
-
-                        <tr>
-                            <td><img src="path_to_guide_photo.jpg" alt="Гид 1" style="width: 100px; height: 100px;"></td>
-                            <td>ФИО</td>
-                            <td>русский</td>
-                            <td>3 года</td>
-                            <td>стомость/час</td>
-                            <td><a href="#" class="btn btn-custom">Выбрать гида</a></td>
-                        </tr>
-        
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-    
     <footer class="bg-light text-center text-lg-start mt-4">
         <div class="container p-4">
             <div class="row">
@@ -307,5 +248,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.9/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
+    <script src="main.js"></script>
 </body>
 </html>
