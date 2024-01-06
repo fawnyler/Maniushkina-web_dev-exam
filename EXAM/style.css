@@ -28,3 +28,24 @@ html {
 .page-item .page-link:hover {
     color: #24494d; 
 }
+
+#route-list {
+    max-width: 100%;
+    overflow: hidden;
+}
+
+#data-table {
+    width: 100%;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.page-item {
+    display: inline-block;
+    margin-right: 5px; 
+    margin-bottom: 5px;
+}
+
+.page-link {
+    border-radius: 3px; 
+}
