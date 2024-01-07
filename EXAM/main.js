@@ -6,7 +6,7 @@ var routeList = document.getElementById("route-list");
 var paginationList = document.getElementById("pagination-list");
 var routesOnPage = 5;
 var currentPage = 1;
-var selectedRoute = null;
+var selectedRoute = [];
 var max_len = 110;
 
 var logJSON = (jsonObject) => {
@@ -14,7 +14,7 @@ var logJSON = (jsonObject) => {
     console.log(jsonString);
 };
 
-// Объявление переменной data в глобальной области видимости
+//объявление data в глобальной области видимости
 var data;
 
 async function getRoute(api) {
@@ -28,23 +28,23 @@ async function getRoute(api) {
             throw new Error(`Ошибка: ${response.status}`);
         }
 
-        // Используем глобальную переменную для сохранения данных
+        //глобальная переменная для сохранения данных
         data = await response.json();
         console.log("Полученные данные:", data);
         renderRoute(data);
         
         var attractions = [...new Set(data.map(route => route.mainObject))];
 
-        // Добавьте опции в элемент select
+        //опции в select
         var attractionSelect = document.getElementById("attractionSelect");
 
-        // Добавляем строку "Не выбрано"
+        //добавление строки "Не выбрано"
         var notSelectedOption = document.createElement("option");
         notSelectedOption.value = "Не выбрано";
         notSelectedOption.text = "Не выбрано";
         attractionSelect.add(notSelectedOption);
 
-        // Добавляем остальные достопримечательности
+        //остальные достопримечательности
         attractions.forEach(attraction => {
             var option = document.createElement("option");
             option.value = attraction;
@@ -60,11 +60,11 @@ async function getRoute(api) {
 }
 async function renderRoute(routes) {
     var dataTableBody = document.getElementById("data-container");
-    dataTableBody.innerHTML = ''; // Очищаем тело таблицы перед добавлением новых данных
+    dataTableBody.innerHTML = ''; //очищение таблицы перед добавлением новых данных
 
-    // Создание таблицы с классами Bootstrap
+    //создание таблицы 
     var table = document.createElement("table");
-    table.classList.add("table", "table-striped"); // Bootstrap классы
+    table.classList.add("table", "table-striped"); 
 
     var tableHeader = document.createElement("thead");
     var headerRow = document.createElement("tr");
@@ -112,11 +112,11 @@ async function renderRoute(routes) {
 
         var selectCell = document.createElement("td");
         var selectButton = document.createElement("button");
-        selectButton.classList.add("btn", "btn-custom-green"); // Bootstrap классы для кнопки
+        selectButton.classList.add("btn", "btn-custom-green"); 
         selectButton.textContent = "Выбрать";
         selectButton.addEventListener("click", () => {
-            selectedRoute = route.id; // Обновляем выбранный маршрут
-            renderRoute(routes); // Перерисовываем таблицу
+            selectedRoute = route.id; //обновление выбранный маршрут
+            renderRoute(routes); //перерисовка таблицы
         });
 
         row.appendChild(nameCell);
@@ -140,14 +140,14 @@ function renderPagination(totalRoutes, routes) {
 
     for (let i = 1; i <= totalPages; i++) {
         var pageLink = document.createElement("li");
-        pageLink.classList.add("page-item"); // Bootstrap класс для элементов пагинации
+        pageLink.classList.add("page-item"); 
 
         var link = document.createElement("a");
-        link.classList.add("page-link"); // Bootstrap класс для ссылок пагинации
+        link.classList.add("page-link"); 
         link.href = "#";
         link.textContent = i;
 
-        // Используем функцию-обертку для захвата текущего значения i
+        //функция-обертка для захвата текущего значения i
         link.addEventListener("click", (function (pageNumber) {
             return function (e) {
                 e.preventDefault();
@@ -161,36 +161,52 @@ function renderPagination(totalRoutes, routes) {
     }
 }
 
-
-// Определение функции searchRoutes с передачей данных в качестве аргумента
+//функция с передачей данных в качестве аргумента
 function searchRoutes(routesData) {
-    console.log("Entering searchRoutes"); // Отладочный вывод
+    console.log("Entering searchRoutes"); 
 
-    // Получаем выбранную достопримечательность
+    //получение выбранную достопримечательность
     var selectedAttraction = document.getElementById("attractionSelect").value;
     
-    if (selectedAttraction === "Не выбрано") {
-        // Если выбрано "Не выбрано", отобразите все маршруты
-        console.log("Displaying all routes"); // Отладочный вывод
+    //получение введенного названия маршрута
+    var routeName = document.getElementById("routeName").value.trim();
+
+    if (selectedAttraction === "Не выбрано" && routeName === "") {
+        //если не выбрано и название маршрута не введено, отобразить все маршруты
+        console.log("Displaying all routes"); 
         renderRoute(routesData);
     } else {
-        // Иначе, отобразите только маршруты с выбранной достопримечательностью
-        console.log("Displaying filtered routes"); // Отладочный вывод
-        var filteredRoutes = routesData.filter(route => route.mainObject === selectedAttraction);
+        //применить фильтры по достопримечательности и названию маршрута
+        console.log("Displaying filtered routes"); 
+        var filteredRoutes = routesData.filter(route => 
+            (selectedAttraction === "Не выбрано" || route.mainObject === selectedAttraction) &&
+            (routeName === "" || route.name.toLowerCase().includes(routeName.toLowerCase()))
+        );
         renderRoute(filteredRoutes);
     }
 }
 
-// Добавление обработчика события для кнопки "Поиск маршрутов"
+//обработчик события для кнопки "поиск маршрутов"
 document.getElementById("searchButton").addEventListener("click", function() {
-    searchRoutes(data); // Передаем данные в функцию searchRoutes
+    searchRoutes(data); //передача данных в searchRoutes
 });
+
 function resetFilter() {
+    //сброс выбранной достопримечательности
     document.getElementById("attractionSelect").selectedIndex = 0;
-    renderRoute(routes);
+
+    //сброс выбранногг маршрута и текущей страницы
+    selectedRoute = null;
+    currentPage = 1;
+
+    //очищение поля ввода для названия маршрута
+    document.getElementById("routeName").value = '';
+
+    //перерисовка таблицы с полным списком маршрутов
+    renderRoute(data);
 }
 
-// Добавляем обработчик события для кнопки "Сбросить фильтр"
+//обработчик события для кнопки "сбросить фильтр"
 var resetButton = document.getElementById("resetButton");
 resetButton.addEventListener("click", resetFilter);
 
@@ -199,20 +215,26 @@ routeNameInput.addEventListener("input", function() {
     searchByName(this.value);
 });
 
-// Функция для поиска маршрутов по названию
+// поиск маршрутов по названию
 function searchByName(routeName) {
-    var filteredRoutes = data.filter(route => route.name.toLowerCase().includes(routeName.toLowerCase()));
+    //получение выбранную достопримечательность
+    var selectedAttraction = document.getElementById("attractionSelect").value;
+
+    //фильтр по названию и достопримечательности
+    var filteredRoutes = data.filter(route => 
+        (selectedAttraction === "Не выбрано" || route.mainObject === selectedAttraction) &&
+        (routeName === "" || route.name.toLowerCase().includes(routeName.toLowerCase()))
+    );
     renderRoute(filteredRoutes);
 }
 
-
-function tooltipInit() {
+function tooltipShow() {
     var tooltips = document.querySelectorAll(".tt");
     tooltips.forEach((tooltip) => new bootstrap.Tooltip(tooltip));
 }
 
 window.addEventListener('load', async () => {
-    tooltipInit();
+    tooltipShow();
     await getRoute(api);
-    renderPagination(data.length, data); // Передаем количество маршрутов и данные
+    renderPagination(data.length, data); // количество маршрутов и данные
 });
