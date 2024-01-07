@@ -6,7 +6,7 @@ var routeList = document.getElementById("route-list");
 var paginationList = document.getElementById("pagination-list");
 var routesOnPage = 5;
 var currentPage = 1;
-var selectedRoute = [];
+var selectedRoute = null;
 var max_len = 110;
 
 var logJSON = (jsonObject) => {
@@ -114,9 +114,10 @@ async function renderRoute(routes) {
         var selectButton = document.createElement("button");
         selectButton.classList.add("btn", "btn-custom-green"); 
         selectButton.textContent = "Выбрать";
-        selectButton.addEventListener("click", () => {
-            selectedRoute = route.id; //обновление выбранный маршрут
-            renderRoute(routes); //перерисовка таблицы
+        selectButton.addEventListener("click", async () => {
+            selectedRoute = route.id;
+            renderRoute(routes);
+            await getGuides(selectedRoute); // Загрузка данных о гидах после выбора маршрута
         });
 
         row.appendChild(nameCell);
@@ -228,6 +229,203 @@ function searchByName(routeName) {
     renderRoute(filteredRoutes);
 }
 
+async function getGuides(routeId) {
+    var guidesUrl = new URL(`http://exam-2023-1-api.std-900.ist.mospolytech.ru/api/routes/${routeId}/guides`);
+    guidesUrl.searchParams.append("api_key", api); // Добавьте ключ API в параметры URL
+    
+    try {
+        var response = await fetch(guidesUrl, {
+            headers: {
+                "Authorization": `Bearer ${api}` // Или добавьте ключ API в заголовки
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Ошибка: ${response.status}`);
+        }
+
+        var guidesData = await response.json();
+        console.log("Полученные данные о гидах:", guidesData);
+        renderGuides(guidesData);
+
+    } catch (error) {
+        console.error("Ошибка во время запроса:", error.message);
+    }
+}
+
+function renderGuides(guides) {
+    console.log("Рендеринг таблицы гидов с данными:", guides);
+    var guidesTableBody = document.getElementById("guides-container");
+    guidesTableBody.innerHTML = '';
+
+    var table = document.createElement("table");
+    table.classList.add("table", "table-striped");
+
+    var tableHeader = document.createElement("thead");
+    var headerRow = document.createElement("tr");
+    var headerColumns = ["", "Язык", "ФИО", "Стоимость/час", "Опыт работы", ""];
+
+    headerColumns.forEach(columnText => {
+        var headerCell = document.createElement("th");
+        headerCell.textContent = columnText;
+        headerRow.appendChild(headerCell);
+    });
+
+    tableHeader.appendChild(headerRow);
+    table.appendChild(tableHeader);
+
+    var tableBody = document.createElement("tbody");
+
+    guides.forEach(guide => {
+        var row = document.createElement("tr");
+
+        var createCell = (textContent, isImage = false) => {
+            var cell = document.createElement("td");
+            
+            if (isImage) {
+                var image = document.createElement("img");
+                image.src = textContent; // Предполагается, что textContent содержит URL аватара
+                image.alt = "Аватар гида";
+                image.style.maxWidth = "50px"; // Устанавливаем максимальную ширину изображения
+                cell.appendChild(image);
+            } else {
+                cell.textContent = textContent;
+            }
+
+            return cell;
+        };
+
+        // Предполагается, что у каждого гида есть поле "avatar", содержащее URL аватара
+        var avatarCell = createCell("../EXAM/images/guide.png", true);
+        var languageCell = createCell(guide.language);
+        var nameCell = createCell(guide.name);
+        var pricePerHourCell = createCell(guide.pricePerHour);
+        var workExperienceCell = createCell(guide.workExperience);
+
+        row.appendChild(avatarCell);
+        row.appendChild(languageCell);
+        row.appendChild(nameCell);
+        row.appendChild(pricePerHourCell);
+        row.appendChild(workExperienceCell);
+
+        var selectCell = document.createElement("td");
+        var selectButton = document.createElement("button");
+        selectButton.classList.add("btn", "btn-custom-green");
+        selectButton.textContent = "Выбрать";
+        selectButton.addEventListener("click", async () => {
+            // Ваш код для обработки выбора гида
+            console.log("Выбран гид:", guide);
+        });
+
+        selectCell.appendChild(selectButton);
+        row.appendChild(selectCell);
+
+        tableBody.appendChild(row);
+    });
+
+    table.appendChild(tableBody);
+    guidesTableBody.appendChild(table);
+}
+
+// Функция для отрисовки фильтра по языку
+function renderLanguageFilter(languages) {
+    var languageSelect = document.getElementById("languageFilter");
+    languageSelect.innerHTML = '';
+
+    var notSelectedOption = document.createElement("option");
+    notSelectedOption.value = "";
+    notSelectedOption.text = "Не выбрано";
+    languageSelect.add(notSelectedOption);
+
+    languages.forEach(language => {
+        var option = document.createElement("option");
+        option.value = language;
+        option.text = language;
+        languageSelect.add(option);
+    });
+
+    // Добавляем обработчик события для фильтрации при изменении значения
+    languageSelect.addEventListener("change", function() {
+        applyFilters();
+    });
+}
+
+// Функция для отрисовки фильтра по опыту работы
+function renderExperienceFilter(experienceLevels) {
+    var experienceFilterContainer = document.getElementById("experienceFilter");
+    experienceFilterContainer.innerHTML = '';
+
+    var label = document.createElement("label");
+    label.textContent = "Опыт работы: ";
+    experienceFilterContainer.appendChild(label);
+
+    var minExperienceInput = document.createElement("input");
+    minExperienceInput.type = "number";
+    minExperienceInput.placeholder = "От";
+    minExperienceInput.id = "minExperienceFilter";
+    minExperienceInput.addEventListener("input", function() {
+        applyFilters();
+    });
+    experienceFilterContainer.appendChild(minExperienceInput);
+
+    var maxExperienceInput = document.createElement("input");
+    maxExperienceInput.type = "number";
+    maxExperienceInput.placeholder = "До";
+    maxExperienceInput.id = "maxExperienceFilter";
+    maxExperienceInput.addEventListener("input", function() {
+        applyFilters();
+    });
+    experienceFilterContainer.appendChild(maxExperienceInput);
+}
+
+// Функция для применения фильтров и обновления таблицы
+function applyFilters() {
+    var selectedLanguage = document.getElementById("languageFilter").value;
+    var minExperience = document.getElementById("minExperienceFilter").value;
+    var maxExperience = document.getElementById("maxExperienceFilter").value;
+
+    // Фильтруем данные в соответствии с выбранными значениями
+    var filteredGuides = data.filter(guide =>
+        (selectedLanguage === "" || guide.language === selectedLanguage) &&
+        (minExperience === "" || (guide.workExperience && parseInt(guide.workExperience) >= parseInt(minExperience))) &&
+        (maxExperience === "" || (guide.workExperience && parseInt(guide.workExperience) <= parseInt(maxExperience)))
+    );
+
+    // Обновляем таблицу с учетом фильтров
+    renderGuides(filteredGuides);
+}
+
+// Вызываем функцию формирования фильтров после получения данных о гидах
+async function fetchDataAndRender() {
+    try {
+        var guidesData = await getGuides(selectedRoute); // Получаем данные о гидах
+        renderGuides(guidesData); // Рендерим таблицу гидов
+        renderFilters(guidesData); // Формируем фильтры на основе данных о гидах
+    } catch (error) {
+        console.error("Ошибка при получении данных о гидах:", error.message);
+    }
+}
+
+// Функция для формирования фильтров
+function renderFilters(guides) {
+    var languages = [...new Set(guides.map(guide => guide.language))];
+    var experienceLevels = [...new Set(guides.map(guide => guide.workExperience))];
+
+    renderLanguageFilter(languages);
+    renderExperienceFilter(experienceLevels);
+
+    // Добавим вызов applyFilters для обновления таблицы при первой отрисовке
+    applyFilters();
+}
+
+document.querySelector('form').addEventListener('submit', function (event) {
+    event.preventDefault(); // Предотвращаем отправку формы по умолчанию
+    applyFilters(); // Вызываем функцию для обновления таблицы по значениям фильтров
+});
+
+fetchDataAndRender(); // Вызываем функцию
+
+
 function tooltipShow() {
     var tooltips = document.querySelectorAll(".tt");
     tooltips.forEach((tooltip) => new bootstrap.Tooltip(tooltip));
@@ -238,3 +436,4 @@ window.addEventListener('load', async () => {
     await getRoute(api);
     renderPagination(data.length, data); // количество маршрутов и данные
 });
+
