@@ -9,6 +9,9 @@ var currentPage = 1;
 var selectedRoute = null;
 var max_len = 110;
 
+var guidesPerPage = 3; // Максимальное количество записей на странице для гидов
+var currentGuidesPage = 1; // Текущая страница
+
 var logJSON = (jsonObject) => {
     var jsonString = JSON.stringify(jsonObject, null, 2);
     console.log(jsonString);
@@ -116,6 +119,7 @@ async function renderRoute(routes) {
         selectButton.textContent = "Выбрать";
         selectButton.addEventListener("click", async () => {
             selectedRoute = route.id;
+            selectedRouteName = route.name; // Обновляем название выбранного маршрута
             renderRoute(routes);
             await getGuides(selectedRoute); // Загрузка данных о гидах после выбора маршрута
         });
@@ -134,6 +138,16 @@ async function renderRoute(routes) {
 
     renderPagination(routes.length, routes); 
 }
+
+// Предположим, у вас есть переменная selectedRouteName, которая содержит название выбранного маршрута
+var selectedRouteName = "Название вашего маршрута"; // Замените этот текст на реальное название маршрута
+
+// Получаем ссылку на элемент заголовка маршрута
+var routeTitleElement = document.getElementById("routeNamePlaceholder");
+
+// Обновляем содержимое элемента текстом выбранного маршрута
+routeTitleElement.textContent = `Гиды по маршруту: ${selectedRouteName}`;
+
 
 function renderPagination(totalRoutes, routes) {
     var totalPages = Math.ceil(totalRoutes / routesOnPage);
@@ -229,14 +243,28 @@ function searchByName(routeName) {
     renderRoute(filteredRoutes);
 }
 
+
+
+
+var guidesPerPage = 3; // Максимальное количество записей на странице для гидов
+var currentGuidesPage = 1; // Текущая страница
+
+
 async function getGuides(routeId) {
+    // Проверяем, если routeId равно null, тогда просто возвращаем пустой массив
+    if (routeId === null) {
+        console.error("Route ID is null");
+        renderGuides([]); // Рендерим пустой список гидов
+        return;
+    }
+
     var guidesUrl = new URL(`http://exam-2023-1-api.std-900.ist.mospolytech.ru/api/routes/${routeId}/guides`);
-    guidesUrl.searchParams.append("api_key", api); // Добавьте ключ API в параметры URL
-    
+    guidesUrl.searchParams.append("api_key", api);
+
     try {
         var response = await fetch(guidesUrl, {
             headers: {
-                "Authorization": `Bearer ${api}` // Или добавьте ключ API в заголовки
+                "Authorization": `Bearer ${api}`
             }
         });
 
@@ -253,10 +281,16 @@ async function getGuides(routeId) {
     }
 }
 
-function renderGuides(guides) {
-    console.log("Рендеринг таблицы гидов с данными:", guides);
+function renderGuidesTable(guides, start, end) {
     var guidesTableBody = document.getElementById("guides-container");
     guidesTableBody.innerHTML = '';
+
+    if (guides.length === 0) {
+        var noDataMessage = document.createElement("p");
+        noDataMessage.textContent = "Нет данных для отображения.";
+        guidesTableBody.appendChild(noDataMessage);
+        return;
+    }
 
     var table = document.createElement("table");
     table.classList.add("table", "table-striped");
@@ -276,7 +310,12 @@ function renderGuides(guides) {
 
     var tableBody = document.createElement("tbody");
 
-    guides.forEach(guide => {
+    for (let i = start; i < end; i++) {
+        if (i >= guides.length) {
+            break;
+        }
+
+        var guide = guides[i];
         var row = document.createElement("tr");
 
         var createCell = (textContent, isImage = false) => {
@@ -321,94 +360,218 @@ function renderGuides(guides) {
         row.appendChild(selectCell);
 
         tableBody.appendChild(row);
-    });
+    }
 
     table.appendChild(tableBody);
     guidesTableBody.appendChild(table);
 }
 
-// Функция для отрисовки фильтра по языку
-function renderLanguageFilter(languages) {
-    var languageSelect = document.getElementById("languageFilter");
+
+function renderGuides(guides) {
+    var totalPages = Math.ceil(guides.length / guidesPerPage);
+    renderGuidesTable(guides, (currentGuidesPage - 1) * guidesPerPage, currentGuidesPage * guidesPerPage);
+    renderGuidesPagination(totalPages);
+}
+
+function renderGuidesPagination(totalPages) {
+    var paginationList = document.getElementById("guides-pagination-list");
+    paginationList.innerHTML = '';
+
+    for (let i = 1; i <= totalPages; i++) {
+        var pageLink = document.createElement("li");
+        pageLink.classList.add("page-item");
+
+        var link = document.createElement("a");
+        link.classList.add("page-link");
+        link.href = "#";
+        link.textContent = i;
+
+        link.addEventListener("click", (function (pageNumber) {
+            return function (e) {
+                e.preventDefault();
+                currentGuidesPage = pageNumber;
+                fetchDataAndRender();
+            };
+        })(i));
+
+        pageLink.appendChild(link);
+        paginationList.appendChild(pageLink);
+    }
+}
+
+// Функция для отрисовки фильтров гидов
+function renderGuidesFilters(languages, experienceLevels) {
+    renderLanguageFilterForGuides(languages);
+    renderExperienceFilterForGuides(experienceLevels);
+
+    // Добавим обработчик события для кнопки применения фильтров
+    var applyGuidesFiltersButton = document.getElementById("applyGuidesFiltersButton");
+    applyGuidesFiltersButton.addEventListener("click", function() {
+        applyGuidesFilters();
+    });
+}
+
+// Функция для отрисовки фильтра по языку для гидов
+function renderLanguageFilterForGuides(languages) {
+    var languageSelect = document.getElementById("languageFilterForGuides");
+    if (!languageSelect) {
+        console.error("Элемент languageFilterForGuides не найден.");
+        return;
+    }
+
     languageSelect.innerHTML = '';
 
+    // Добавление опции "Не выбрано"
     var notSelectedOption = document.createElement("option");
     notSelectedOption.value = "";
     notSelectedOption.text = "Не выбрано";
     languageSelect.add(notSelectedOption);
 
-    languages.forEach(language => {
-        var option = document.createElement("option");
-        option.value = language;
-        option.text = language;
-        languageSelect.add(option);
-    });
+    // Проверка на наличие языков перед добавлением их в селектор
+    if (languages && languages.length > 0) {
+        // Добавление языков гидов в селектор
+        languages.forEach(language => {
+            if (language) { // Убеждаемся, что у языка есть значение перед добавлением
+                var option = document.createElement("option");
+                option.value = language;
+                option.text = language;
+                languageSelect.add(option);
+            }
+        });
+    } else {
+        console.warn("Нет доступных языков для отображения.");
+    }
 
-    // Добавляем обработчик события для фильтрации при изменении значения
+    // Добавление обработчика события для фильтрации при изменении значения
     languageSelect.addEventListener("change", function() {
-        applyFilters();
+        applyGuidesFilters(); // Применяем фильтры после выбора языка
     });
 }
 
-// Функция для отрисовки фильтра по опыту работы
-function renderExperienceFilter(experienceLevels) {
-    var experienceFilterContainer = document.getElementById("experienceFilter");
+
+// Функция для получения уникальных языков гидов
+function getUniqueLanguages(guides) {
+    var uniqueLanguages = [...new Set(guides.map(guide => guide.language))];
+    return uniqueLanguages;
+}
+
+// Функция для отрисовки фильтра по опыту работы для гидов
+function renderExperienceFilterForGuides(experienceLevels) {
+    var experienceFilterContainer = document.getElementById("experienceFilterForGuides");
     experienceFilterContainer.innerHTML = '';
 
     var label = document.createElement("label");
-    label.textContent = "Опыт работы: ";
+    label.textContent = "Опыт работы гидов: ";
     experienceFilterContainer.appendChild(label);
 
     var minExperienceInput = document.createElement("input");
     minExperienceInput.type = "number";
     minExperienceInput.placeholder = "От";
-    minExperienceInput.id = "minExperienceFilter";
+    minExperienceInput.id = "minExperienceFilterForGuides";
     minExperienceInput.addEventListener("input", function() {
-        applyFilters();
+        applyGuidesFilters(); // Применяем фильтры при изменении значения
     });
     experienceFilterContainer.appendChild(minExperienceInput);
 
     var maxExperienceInput = document.createElement("input");
     maxExperienceInput.type = "number";
     maxExperienceInput.placeholder = "До";
-    maxExperienceInput.id = "maxExperienceFilter";
+    maxExperienceInput.id = "maxExperienceFilterForGuides";
     maxExperienceInput.addEventListener("input", function() {
-        applyFilters();
+        applyGuidesFilters(); // Применяем фильтры при изменении значения
     });
     experienceFilterContainer.appendChild(maxExperienceInput);
 }
 
-// Функция для применения фильтров и обновления таблицы
-function applyFilters() {
-    var selectedLanguage = document.getElementById("languageFilter").value;
-    var minExperience = document.getElementById("minExperienceFilter").value;
-    var maxExperience = document.getElementById("maxExperienceFilter").value;
 
-    // Фильтруем данные в соответствии с выбранными значениями
+// Функция для применения фильтров гидов и обновления таблицы
+function applyGuidesFilters() {
+    console.log("Applying guides filters");
+
+    var selectedLanguage = document.getElementById("languageFilterForGuides").value;
+    var minExperience = parseInt(document.getElementById("minExperienceFilterForGuides").value) || 0;
+    var maxExperience = parseInt(document.getElementById("maxExperienceFilterForGuides").value) || Number.MAX_SAFE_INTEGER;
+
+    console.log("Selected language for guides:", selectedLanguage);
+    console.log("Min experience for guides:", minExperience);
+    console.log("Max experience for guides:", maxExperience);
+
+    // Фильтрация данных о гидах в соответствии с выбранными значениями
     var filteredGuides = data.filter(guide =>
         (selectedLanguage === "" || guide.language === selectedLanguage) &&
-        (minExperience === "" || (guide.workExperience && parseInt(guide.workExperience) >= parseInt(minExperience))) &&
-        (maxExperience === "" || (guide.workExperience && parseInt(guide.workExperience) <= parseInt(maxExperience)))
+        (guide.workExperience !== undefined && guide.workExperience >= minExperience && guide.workExperience <= maxExperience)
     );
 
-    // Обновляем таблицу с учетом фильтров
-    renderGuides(filteredGuides);
+    console.log("Filtered guides:", filteredGuides);
+
+    // Обновление таблицы гидов с учетом фильтров
+    if (filteredGuides.length > 0) {
+        renderGuidesTable(filteredGuides, 0, guidesPerPage);
+        renderGuidesPagination(Math.ceil(filteredGuides.length / guidesPerPage));
+    } else {
+        var guidesTableBody = document.getElementById("guides-container");
+        guidesTableBody.innerHTML = '<p>Нет данных для отображения.</p>';
+        var paginationList = document.getElementById("guides-pagination-list");
+        paginationList.innerHTML = '';
+    }
 }
 
-// Вызываем функцию формирования фильтров после получения данных о гидах
-async function fetchDataAndRender() {
+
+// Обработчик события для кнопки "Применить фильтры гидов"
+var applyGuidesFiltersButton = document.getElementById("applyGuidesFiltersButton");
+applyGuidesFiltersButton.addEventListener("click", function() {
+    applyGuidesFilters();
+});
+
+// Добавление обработчика события для кнопки "Сбросить фильтр гидов"
+var resetGuidesFiltersButton = document.getElementById("resetGuidesFiltersButton");
+resetGuidesFiltersButton.addEventListener("click", function() {
+    resetGuidesFilters();
+});
+
+// Функция сброса фильтров гидов
+async function resetGuidesFilters() {
+    // Сброс значений фильтров к их начальным значениям
+    document.getElementById("languageFilterForGuides").selectedIndex = 0;
+    document.getElementById("minExperienceFilterForGuides").value = '';
+    document.getElementById("maxExperienceFilterForGuides").value = '';
+
+    // Применение сброса и обновление таблицы гидов
+    applyGuidesFilters();
+
     try {
-        var guidesData = await getGuides(selectedRoute); // Получаем данные о гидах
-        renderGuides(guidesData); // Рендерим таблицу гидов
-        renderFilters(guidesData); // Формируем фильтры на основе данных о гидах
+        // Загрузка данных о гидах
+        var guidesData = await getGuides(selectedRoute);
+
+        // Проверка, что данные гидов успешно получены и они не пусты
+        if (guidesData) {
+            // Отображение таблицы гидов
+            renderGuides(guidesData);
+            // Обновление пагинации для таблицы гидов
+            renderGuidesPagination(Math.ceil(guidesData.length / guidesPerPage));
+        } 
     } catch (error) {
         console.error("Ошибка при получении данных о гидах:", error.message);
     }
 }
 
+// Вызываем функцию формирования фильтров гидов после получения данных о гидах
+async function fetchDataAndRender() {
+    try {
+        var guidesData = await getGuides(selectedRoute);
+        renderGuides(guidesData);
+        renderLanguageFilterForGuides(getUniqueLanguages(guidesData));
+    } catch (error) {
+        console.error("Ошибка при получении данных о гидах:", error.message);
+        renderLanguageFilterForGuides([]);
+    }
+}
+
+
 // Функция для формирования фильтров
 function renderFilters(guides) {
-    var languages = [...new Set(guides.map(guide => guide.language))];
+    var languageSelect = document.getElementById("languageFilter");
+    if (!languageSelect) return; // Проверяем, существует ли элемент
     var experienceLevels = [...new Set(guides.map(guide => guide.workExperience))];
 
     renderLanguageFilter(languages);
@@ -424,7 +587,6 @@ document.querySelector('form').addEventListener('submit', function (event) {
 });
 
 fetchDataAndRender(); // Вызываем функцию
-
 
 function tooltipShow() {
     var tooltips = document.querySelectorAll(".tt");
