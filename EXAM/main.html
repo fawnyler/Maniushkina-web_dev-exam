@@ -38,6 +38,10 @@
         </nav>
     </header>
     
+    <div class="alert alert-info" role="alert">
+        Вам пришло уведомление!
+    </div>
+
     <div id="notification-panel" class="row notification-panel">
         <div class="notification-content" id="notification-content">
         </div>
@@ -109,47 +113,34 @@
                 </div>
             </div>
         
-        <div id="guides-section">
-            <h2 id="selected-route-title" class="mb-3">Гиды по маршруту: Название Маршрута</h2>
-            <div class="container mt-4">
-                <form>
-                    <div class="form-row align-items-end">
-                        <div class="col">
-                            <label for="languageSelect">Выберите язык экскурсии</label>
-                            <select class="form-control" id="languageSelect">
-                                <option>Не выбрано</option>
-                            </select>
-                        </div>
-                        <div class="col">
-                            <label for="experienceFrom">Опыт работы</label>
-                            <input type="number" class="form-control" id="experienceFrom" placeholder="от">
-                        </div>
-                        <div class="col">
-                            <input type="number" class="form-control" id="experienceTo" placeholder="до">
-                        </div>
+        
+            <h2 id="selected-route-title" class="mb-3"><span id="routeNamePlaceholder">...</span></h2>
+            <div id="guides-filters">
+                <label for="languageFilterForGuides">Язык гида:</label>
+                <select id="languageFilterForGuides">
+                    <!-- Опции будут добавлены динамически при загрузке гидов -->
+                </select>
+            
+                <label for="minExperienceFilterForGuides">Опыт работы</label>
+                <input type="number" id="minExperienceFilterForGuides" placeholder="от">
+            
+                <label for="maxExperienceFilterForGuides"></label>
+                <input type="number" id="maxExperienceFilterForGuides" placeholder="до">
+            
+                <button id="applyGuidesFiltersButton" class="btn btn-custom-green">Применить фильтры</button>
+                <button id="resetGuidesFiltersButton" class="btn btn-secondary" >Сбросить фильтр</button>
 
-                        <div class="col-auto">
-                            <button type="submit" class="btn btn-custom-green">Поиск гидов</button>
-                        </div>
-                    </div>
-                </form>
             </div>
             
             <div class="table-responsive">
-                <table class="table mt-4">
-                    <tbody>
-                        <tr>
-                            <td><img src="path_to_guide_photo.jpg" alt="Гид 1" style="width: 100px; height: 100px;"></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td><a href="#" class="btn btn-custom">Выбрать гида</a></td>
-                        </tr>
-                    </tbody>
+                <table class="table table-hover mt-4">
+                    <thead></thead>
+                    <tbody id="guides-container"></tbody>
                 </table>
             </div>
-        </div>
+            <div id="guides-pagination-list"></div>
+        
+
     </div>
 
         <div class="container mt-4 mb-4">
