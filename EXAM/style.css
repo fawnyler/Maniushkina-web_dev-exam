@@ -49,3 +49,9 @@ html {
 .page-link {
     border-radius: 3px; 
 }
+
+#guides-pagination-list {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
