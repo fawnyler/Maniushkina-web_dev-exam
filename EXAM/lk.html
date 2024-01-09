@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="images/logo.png">
     <title>Московские Шаги</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="style.css">
@@ -37,8 +38,8 @@
         </nav>
     </header>
     
-    <div id="notification-area" aria-live="polite" aria-atomic="true" style="position: relative; min-height: 200px;">
-        <!-- алерты -->
+    <div class="alert alert-info" role="alert">
+        Вам пришло уведомление!
     </div>
     
     <div class="container mt-4">
@@ -118,7 +119,8 @@
                         <h6>Опции:</h6>
                         <ul id="optionsList">
                             <!-- Динамически заполняемый список опций -->
-                            <li>Опция 1 - Описание - Скидка/Надбавка</li>
+                            <li>Опция 1 - Легкие закуски и горячие напитки во время экскурсии - + 1000 руб/посетитель</li>
+                            <li>Опция 2 - Интерактивный путеводитель - * 1,5 раза</li>
                         </ul>
                         <h6>Итоговая стоимость: <span id="totalCost">3000 руб.</span></h6>
                     </div>
