@@ -11,70 +11,91 @@ var max_len = 110;
 
 var selectedRouteBeforeFilter = null;
 
-var guidesPerPage = 3; // Максимальное количество записей на странице для гидов
-var currentGuidesPage = 1; // Текущая страница
+var guidesPerPage = 3; 
+var currentGuidesPage = 1; 
 
 var logJSON = (jsonObject) => {
     var jsonString = JSON.stringify(jsonObject, null, 2);
     console.log(jsonString);
 };
 
-//объявление data в глобальной области видимости
+//объявление data для её видимости и доступности в любой части кода
 var data;
 
+//получение данных о маршрутах
 async function getRoute(api) {
+    //создание url для запроса 
     var Url = new URL("http://exam-2023-1-api.std-900.ist.mospolytech.ru/api/routes");
     Url.searchParams.append("api_key", api);
 
     try {
+        //отправка get запроса к серверу
         var response = await fetch(Url);
 
         if (!response.ok) {
             throw new Error(`Ошибка: ${response.status}`);
         }
 
-        //глобальная переменная для сохранения данных
+        //глобальная переменная для сохранения данных в формате json 
         data = await response.json();
         console.log("Полученные данные:", data);
+        //вызов функции для отображения маршрутов на сайте
         renderRoute(data);
         
-        var attractions = [...new Set(data.map(route => route.mainObject))];
+        //находим уникальные достопримечатнльности из полученных данных
+        var mainObjects = [...new Set(data.map(route => route.mainObject))];
 
-        //опции в select
-        var attractionSelect = document.getElementById("attractionSelect");
+        var mainObjectSelect = document.getElementById("mainObjectSelect");
 
         //добавление строки "Не выбрано"
         var notSelectedOption = document.createElement("option");
         notSelectedOption.value = "Не выбрано";
         notSelectedOption.text = "Не выбрано";
-        attractionSelect.add(notSelectedOption);
+        mainObjectSelect.add(notSelectedOption);
 
         //остальные достопримечательности
-        attractions.forEach(attraction => {
+        mainObjects.forEach(mainObject => {
             var option = document.createElement("option");
-            option.value = attraction;
-            option.text = attraction;
-            attractionSelect.add(option);
+            option.value = mainObject;
+            option.text = mainObject;
+            mainObjectSelect.add(option);
         });
 
+        //вызов функции для отображения маршрутов на сайте
         renderRoute(data);
 
     } catch (error) {
+        //если ошибка, выводим ссобщение в консоль отладки
         console.error("Ошибка во время запроса:", error.message);
+        
+        //создание элемента с сообщением об ошибке
+        var errorMessage = document.createElement("p");
+        errorMessage.textContent = "Произошла ошибка при загрузке данных. Пожалуйста, повторите попытку позже.";
+        
+        //нахождение контейнера для данных на сайте и его очищение
+        var dataTableBody = document.getElementById("data-container");
+        dataTableBody.innerHTML = "";
+        //добавление сообщения об ошибке в контейнер
+        dataTableBody.appendChild(errorMessage);
     }
 }
+
+//отображение маршрутов на сайте
 async function renderRoute(routes) {
     var dataTableBody = document.getElementById("data-container");
-    dataTableBody.innerHTML = ''; //очищение таблицы перед добавлением новых данных
+    //очищение таблицы перед добавлением новых данных
+    dataTableBody.innerHTML = ''; 
 
     //создание таблицы 
     var table = document.createElement("table");
     table.classList.add("table", "table-striped"); 
 
+    //создание заголовков таблицы
     var tableHeader = document.createElement("thead");
     var headerRow = document.createElement("tr");
     var headerColumns = ["Название маршрута", "Описание", "Достопримечательности", ""];
 
+    //добавление заголовков столбцов
     headerColumns.forEach(columnText => {
         var headerCell = document.createElement("th");
         headerCell.textContent = columnText;
@@ -84,18 +105,22 @@ async function renderRoute(routes) {
     tableHeader.appendChild(headerRow);
     table.appendChild(tableHeader);
 
+    //создание тела таблицы
     var tableBody = document.createElement("tbody");
 
+    //вычисление начала и конца диапазона маршрутов, которыц нужно отобразить
     var start = (currentPage - 1) * routesOnPage;
     var end = start + routesOnPage;
     var routesToShow = routes.slice(start, end);    
 
+    //перебор маршрутов для отображения каждого в таблице
     routesToShow.forEach((route) => {
         var row = document.createElement("tr");
         if (selectedRoute === route.id) {
             row.classList.add("table-success");
         }
 
+        //создание ячейки таблицы с возможностью обрезать текст, если он слишком длинный
         var createCell = (textContent, maxLength) => {
             var cell = document.createElement("td");
             var content = (textContent.length > maxLength) ? `${textContent.substring(0, maxLength)}...` : textContent;
@@ -119,11 +144,12 @@ async function renderRoute(routes) {
         var selectButton = document.createElement("button");
         selectButton.classList.add("btn", "btn-custom-green"); 
         selectButton.textContent = "Выбрать";
-        // Обработчик клика на кнопке "Выбрать" маршрута
+
+        //обработчик клика на кнопке "Выбрать" маршрута
         selectButton.addEventListener("click", async () => {
             selectedRoute = route.id;
-            renderRoute(routes); // Перерисовываем таблицу, чтобы выделить выбранный маршрут
-            await getGuides(selectedRoute); // Загружаем данные о гидах после выбора маршрута
+            renderRoute(routes); //перерисовка таблицы, чтобы выделить выбранный маршрут
+            await getGuides(selectedRoute); //загрузка данных о гидах после выбора маршрута
         });
         
 
@@ -136,32 +162,39 @@ async function renderRoute(routes) {
         tableBody.appendChild(row);
     });
 
+    //добавление тела таблицы к таблице
     table.appendChild(tableBody);
+    //доабвление таблицы к элементу, где она будет отображаться на сайте
     dataTableBody.appendChild(table);
 
+    //вызов функции отображения пагинации
     renderPagination(routes.length, routes); 
 }
 
-
+//функция для отображения пагинации
 function renderPagination(totalRoutes, routes) {
+    //вычисление общего кол-ва страниц
     var totalPages = Math.ceil(totalRoutes / routesOnPage);
     paginationList.innerHTML = "";
 
+    //создание пагинации лоя каждой страницы
     for (let i = 1; i <= totalPages; i++) {
+        //создание элемента списка для страницы
         var pageLink = document.createElement("li");
         pageLink.classList.add("page-item"); 
 
+        //создание ссылки для перехода на страницу
         var link = document.createElement("a");
         link.classList.add("page-link"); 
         link.href = "#";
         link.textContent = i;
 
-        //функция-обертка для захвата текущего значения i
+        //обработчик клика на ссылку
         link.addEventListener("click", (function (pageNumber) {
             return function (e) {
                 e.preventDefault();
-                currentPage = pageNumber;
-                renderRoute(routes);
+                currentPage = pageNumber; //текущая страница
+                renderRoute(routes); //перерисовка таблица маршрутов для выбранной страницы
             };
         })(i));
 
@@ -170,29 +203,28 @@ function renderPagination(totalRoutes, routes) {
     }
 }
 
-//функция с передачей данных в качестве аргумента
+//фильтр маршрутов на основе выбранной достопримечательности и названия маршрута
 function searchRoutes(routesData) {
-
-    // Сохраняем выбранный маршрут перед применением фильтров
+    //сохранение выбранного маршрута перед исользованием фильтров
     var selectedRouteBeforeFilter = selectedRoute;
 
-    // Получение выбранной достопримечательности
-    var selectedAttraction = document.getElementById("attractionSelect").value;
+    //получение выбранной достопримечательности
+    var selectedAttraction = document.getElementById("mainObjectSelect").value;
 
-    // Получение введенного названия маршрута
+    //получение введенного названия маршрута
     var routeName = document.getElementById("routeName").value.trim();
 
     if (selectedAttraction === "Не выбрано" && routeName === "") {
-        // Если не выбрано и название маршрута не введено, отобразить все маршруты
+        //если  не выбрано и название маршрута не введено, отобразить все маршруты
         renderRoute(routesData);
     } else {
-        // Применить фильтры по достопримечательности и названию маршрута
+        //применение фильтров по достопримечательности и названию маршрута
         var filteredRoutes = routesData.filter(route =>
             (selectedAttraction === "Не выбрано" || route.mainObject === selectedAttraction) &&
             (routeName === "" || route.name.toLowerCase().includes(routeName.toLowerCase()))
         );
 
-        // Если был выбран маршрут до применения фильтров, восстановите его
+        //отображение и сохранение выбранного маршрута при использовании фильтров
         if (selectedRouteBeforeFilter) {
             selectedRoute = selectedRouteBeforeFilter;
         }
@@ -201,27 +233,27 @@ function searchRoutes(routesData) {
     }
 }
 
-
 //обработчик события для кнопки "поиск маршрутов"
 document.getElementById("searchButton").addEventListener("click", function() {
     searchRoutes(data); //передача данных в searchRoutes
 });
 
+//сброс фильтров
 function resetFilter() {
-    // Сохраните выбранный маршрут перед сбросом фильтров
+    //сохранение выбранного маршрута перед сбросом фильтров
     selectedRouteBeforeFilter = selectedRoute;
 
-    // Сброс выбранной достопримечательности
-    document.getElementById("attractionSelect").selectedIndex = 0;
+    //сброс выбранной достопримечательности
+    document.getElementById("mainObjectSelect").selectedIndex = 0;
 
-    // Сброс выбранного маршрута и текущей страницы
-    selectedRoute = selectedRouteBeforeFilter; // Восстанавливаем значение selectedRoute
+    //сброс выбранного маршрута и текущей страницы
+    selectedRoute = selectedRouteBeforeFilter; //восстанавливаем значение selectedRoute
     currentPage = 1;
 
-    // Очистка поля ввода для названия маршрута
+    //очищение поля ввода для названия маршрута
     document.getElementById("routeName").value = '';
 
-    // Перерисовка таблицы с полным списком маршрутов
+    //перерисовка таблицы с полным списком маршрутов
     renderRoute(data);
 }
 
@@ -237,8 +269,8 @@ routeNameInput.addEventListener("input", function() {
 
 // поиск маршрутов по названию
 function searchByName(routeName) {
-    //получение выбранную достопримечательность
-    var selectedAttraction = document.getElementById("attractionSelect").value;
+    //получение выбранной достопримечательности
+    var selectedAttraction = document.getElementById("mainObjectSelect").value;
 
     //фильтр по названию и достопримечательности
     var filteredRoutes = data.filter(route => 
@@ -248,36 +280,33 @@ function searchByName(routeName) {
     renderRoute(filteredRoutes);
 }
 
+//ЧАСТЬ С ГИДАМИ
+var guidesPerPage = 3; 
+var currentGuidesPage = 1; 
 
-
-var guidesPerPage = 3; // Максимальное количество записей на странице для гидов
-var currentGuidesPage = 1; // Текущая страница
-
-
+//получение данных о гидах
 async function getGuides(routeId) {
-    // Проверяем, если routeId равно null, тогда просто возвращаем пустой массив
+    //проверка, если routeId равно null, тогда возвращаем пустой массив
     if (routeId === null) {
-        console.error("Route ID is null");
-        renderGuides([]); // Рендерим пустой список гидов
+        renderGuides([]); 
         return;
     }
-
+    //формирование URL для запроса данных о гидах для конкретного маршрута (по id)
     var guidesUrl = new URL(`http://exam-2023-1-api.std-900.ist.mospolytech.ru/api/routes/${routeId}/guides`);
     guidesUrl.searchParams.append("api_key", api);
 
     try {
-        var response = await fetch(guidesUrl, {
-            headers: {
-                "Authorization": `Bearer ${api}`
-            }
-        });
+        //асинхрон запрос для получения данных о гидах
+        var response = await fetch(guidesUrl);
 
         if (!response.ok) {
             throw new Error(`Ошибка: ${response.status}`);
         }
 
+        //получение данных о гидах 
         var guidesData = await response.json();
         console.log("Полученные данные о гидах:", guidesData);
+        //отображение данных о гидах на странице 
         renderGuides(guidesData);
 
     } catch (error) {
@@ -290,6 +319,7 @@ function renderGuidesTable(guides, start, end) {
     guidesTableBody.innerHTML = '';
 
     if (guides.length === 0) {
+        //если нет данных о гидах, выводим сообщение
         var noDataMessage = document.createElement("p");
         noDataMessage.textContent = "Нет данных для отображения.";
         guidesTableBody.appendChild(noDataMessage);
@@ -304,6 +334,7 @@ function renderGuidesTable(guides, start, end) {
     var headerColumns = ["", "Язык", "ФИО", "Стоимость/час", "Опыт работы", ""];
 
     headerColumns.forEach(columnText => {
+        //создание заголовков столбцов таблицы
         var headerCell = document.createElement("th");
         headerCell.textContent = columnText;
         headerRow.appendChild(headerCell);
@@ -322,7 +353,7 @@ function renderGuidesTable(guides, start, end) {
         var guide = guides[i];
         var row = document.createElement("tr");
 
-        // Проверяем, выбран ли данный гид, и добавляем класс "table-success" для выделения
+        //проверяем, выбран ли данный гид, и добавляем класс table-success для выделения
         if (selectedGuide === guide.id) {
             row.classList.add("table-success");
         }
@@ -331,6 +362,7 @@ function renderGuidesTable(guides, start, end) {
             var cell = document.createElement("td");
 
             if (isImage) {
+                //если isImage равно true, создаем ячейку с изображением 
                 var image = document.createElement("img");
                 image.src = textContent;
                 image.alt = "Аватар гида";
@@ -343,18 +375,17 @@ function renderGuidesTable(guides, start, end) {
             return cell;
         };
 
-        // Предполагается, что у каждого гида есть поле "avatar", содержащее URL аватара
         var avatarCell = createCell("../EXAM/images/guide.png", true);
         var languageCell = createCell(guide.language);
         var nameCell = createCell(guide.name);
 
-        // Создаем ячейку для стоимости с подписью "руб/час"
+        //создание ячейку для стоимости с подписью "руб/час"
         var pricePerHourCell = document.createElement("td");
         var priceSpan = document.createElement("span");
         priceSpan.textContent = guide.pricePerHour + " руб/час";
         pricePerHourCell.appendChild(priceSpan);
 
-        // Создаем ячейку для опыта работы с подписью "лет"
+        //создание ячейку для опыта работы с подписью "лет"
         var workExperienceCell = document.createElement("td");
         var experienceSpan = document.createElement("span");
         experienceSpan.textContent = guide.workExperience + " лет";
@@ -371,7 +402,7 @@ function renderGuidesTable(guides, start, end) {
         selectButton.classList.add("btn", "btn-custom-green");
         selectButton.textContent = "Выбрать";
 
-        // Используем замыкание для сохранения правильного идентификатора гида
+        //замыкание для сохранения правильного идентификатора гида
         selectButton.addEventListener("click", (function (selectedGuideId) {
             return function () {
                 selectedGuide = selectedGuideId;
@@ -392,8 +423,11 @@ function renderGuidesTable(guides, start, end) {
 
 
 function renderGuides(guides) {
+    //вычисление общее кол-во страниц для отображения данных о гидах
     var totalPages = Math.ceil(guides.length / guidesPerPage);
+    //вызов функции отображения таблицы с гидами, передавая индексы начала и конца текущей страницы
     renderGuidesTable(guides, (currentGuidesPage - 1) * guidesPerPage, currentGuidesPage * guidesPerPage);
+    //вызов функции отображения пагинации для гидов, передавая общее количество страниц
     renderGuidesPagination(totalPages);
 }
 
@@ -401,6 +435,7 @@ function renderGuidesPagination(totalPages) {
     var paginationList = document.getElementById("guides-pagination-list");
     paginationList.innerHTML = '';
 
+    //создание элементов пагинации для каждой страницы
     for (let i = 1; i <= totalPages; i++) {
         var pageLink = document.createElement("li");
         pageLink.classList.add("page-item");
@@ -410,11 +445,12 @@ function renderGuidesPagination(totalPages) {
         link.href = "#";
         link.textContent = i;
 
+        //обработчик клика на страницу пагинации
         link.addEventListener("click", (function (pageNumber) {
             return function (e) {
                 e.preventDefault();
-                currentGuidesPage = pageNumber;
-                fetchDataAndRender();
+                currentGuidesPage = pageNumber; //установка текущей страницы в соответствии с номером страницы, по которой кликнули
+                fetchDataAndRender(); //запрашиваем и отображаем данные для выбранной страницы
             };
         })(i));
 
@@ -423,63 +459,23 @@ function renderGuidesPagination(totalPages) {
     }
 }
 
-// Обработчик кнопки "Применить фильтры"
-document.getElementById("applyGuidesFiltersButton").addEventListener("click", function () {
-    applyGuidesFilters();
-});
-
-// Обработчик кнопки "Сбросить фильтр"
-document.getElementById("resetGuidesFiltersButton").addEventListener("click", function () {
-    resetGuidesFilters();
-});
-
-function applyGuidesFilters() {
-    var languageFilter = document.getElementById("languageFilterForGuides").value;
-    var minExperienceFilter = parseInt(document.getElementById("minExperienceFilterForGuides").value);
-    var maxExperienceFilter = parseInt(document.getElementById("maxExperienceFilterForGuides").value);
-
-    var filteredGuides = data.filter(function (guide) {
-        // Проверяем фильтр по языку
-        if (languageFilter !== "Не выбрано" && guide.language !== languageFilter) {
-            return false;
-        }
-
-        // Проверяем фильтры по опыту работы
-        if (!isNaN(minExperienceFilter) && guide.workExperience < minExperienceFilter) {
-            return false;
-        }
-        if (!isNaN(maxExperienceFilter) && guide.workExperience > maxExperienceFilter) {
-            return false;
-        }
-
-        return true;
-    });
-
-    renderGuides(filteredGuides);
-}
-
-function resetGuidesFilters() {
-    document.getElementById("languageFilterForGuides").value = "Не выбрано";
-    document.getElementById("minExperienceFilterForGuides").value = "";
-    document.getElementById("maxExperienceFilterForGuides").value = "";
-
-    renderGuides(data);
-}
-
-
-// Вызываем функцию формирования фильтров гидов после получения данных о гидах
+//функция формирования фильтров гидов после получения данных о гидах
 async function fetchDataAndRender() {
     try {
         var guidesData = await getGuides(selectedRoute);
-        renderGuides(guidesData);
+        if (guidesData !== undefined) {
+            renderGuides(guidesData);
+        } else {
+            console.log("Данные о гидах не определены");
+        }
     } catch (error) {
         console.error("Ошибка при получении данных о гидах:", error.message);
     }
 }
 
+fetchDataAndRender(); // Вызываем эту функцию
 
-fetchDataAndRender(); // Вызываем функцию
-
+//отображение подсказов на странице
 function tooltipShow() {
     var tooltips = document.querySelectorAll(".tt");
     tooltips.forEach((tooltip) => new bootstrap.Tooltip(tooltip));
@@ -490,4 +486,3 @@ window.addEventListener('load', async () => {
     await getRoute(api);
     renderPagination(data.length, data); // количество маршрутов и данные
 });
-
