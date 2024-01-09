@@ -88,8 +88,8 @@
                     </div>
                 
                     <div class="col">
-                        <label for="attractionSelect">Выберите достопримечтальность</label>
-                        <select class="form-control" id="attractionSelect">
+                        <label for="mainObjectSelect">Выберите достопримечтальность</label>
+                        <select class="form-control" id="mainObjectSelect">
                         </select>
                     </div>
                 
@@ -114,11 +114,11 @@
             </div>
         
         
-            <h2 id="selected-route-title" class="mb-3"><span id="routeNamePlaceholder">...</span></h2>
+            <h2 id="selected-route-title" class="mb-3"><span id="routeNamePlaceholder">Гиды по выбранному маршруту</span></h2>
             <div id="guides-filters">
                 <label for="languageFilterForGuides">Язык гида:</label>
                 <select id="languageFilterForGuides">
-                    <!-- Опции будут добавлены динамически при загрузке гидов -->
+                    <option value="Не выбрано">Не выбрано</option>
                 </select>
             
                 <label for="minExperienceFilterForGuides">Опыт работы</label>
@@ -236,7 +236,6 @@
     
     
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.9/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
     <script src="main.js"></script>
